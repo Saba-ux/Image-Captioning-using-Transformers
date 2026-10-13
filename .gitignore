@@ -1,0 +1,56 @@
+
+# Virtual environments
+.venv/
+.venv-x86/
+venv/
+env/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# macOS files
+.DS_Store
+
+# IDE settings
+.vscode/
+.idea/
+
+# Logs and temporary files
+logs/
+*.log
+*.tmp
+
+# Datasets and downloaded image collections
+data/
+
+
+# Large image collections (keep code and configuration)
+images/
+*.h5
+*.hdf5
+
+# Model checkpoints and trained weights
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+
+# Experiment outputs
+runs/
+wandb/
+mlruns/
+
+
+# Original backup code
+code_original/
