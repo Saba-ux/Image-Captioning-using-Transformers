@@ -31,7 +31,11 @@ def parse_arguments() -> Namespace:
         type=str,
         default="gpu",  # gpu, cpu, mgpu
         help='path to pre-trained word Embedding.')
-
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Maximum number of test images to process.")
     args = parser.parse_args()
 
     return args

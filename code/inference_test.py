@@ -1,3 +1,4 @@
+from itertools import islice
 from pathlib import Path
 from collections import defaultdict
 from statistics import mean, pstdev
@@ -42,10 +43,10 @@ if __name__ == "__main__":
     # SEED
     SEED = config["seed"]
     seed_everything(SEED)
-
     # load vocab
     print("loading dataset...")
     vocab = SimpleVocab.load(str(Path(dataset_dir) / "vocab.json"))
+    
     pad_id = vocab.stoi["<pad>"]
     sos_id = vocab.stoi["<sos>"]
     eos_id = vocab.stoi["<eos>"]
@@ -92,8 +93,7 @@ if __name__ == "__main__":
     # load
     load_path = str(Path(checkpoints_dir) / checkpoint_name)
     state = torch.load(load_path,
-                       map_location=torch.device("cpu"),
-                       weights_only=False)
+                        map_location=torch.device("cpu"))
     image_model_state = state["models"][0]
     transformer_state = state["models"][1]
     image_enc.load_state_dict(image_model_state)
@@ -141,7 +141,9 @@ if __name__ == "__main__":
         })
     nlgmetrics = Metrics()
     bleu4 = []
-    pb = tqdm(val_iter, leave=False, total=len(val_iter))
+    total_images = len(val_iter) if args.limit is None else min(args.limit, len(val_iter))
+    limited_iter = val_iter if args.limit is None else islice(val_iter, args.limit)
+    pb = tqdm(limited_iter, leave=False, total=total_images)
     pb.unit = "step"
     for imgs, cptns_all, lens in pb:
         imgs: Tensor  # images [1, 3, 256, 256]
@@ -215,10 +217,8 @@ if __name__ == "__main__":
                 seq_preds.extend(seq.tolist()
                                  for seq in current_preds[seqs_end])
                 seq_log_probs.extend(log_prob_topk[seqs_end].tolist())
-                # get last layer, mean across transformer heads
-                attns = attns[-1].mean(dim=1).view(k, -1, h, w)
-                # [k, S, h, w]
-                seq_attns.extend(attns[prev_seq_k][seqs_end].tolist())
+                # Attention maps are not required for caption evaluation.
+                seq_attns.extend([[] for _ in range(int(seqs_end.sum().item()))])
 
                 k -= torch.sum(seqs_end)
                 current_preds = current_preds[~seqs_end]
@@ -233,7 +233,7 @@ if __name__ == "__main__":
         text_preds = [[vocab.itos[s] for s in seq if s not in specials]
                       for seq in seq_preds]
         text_refs = [[vocab.itos[r] for r in ref if r not in specials]
-                     for ref in cptns_all.squeeze(0).permute(1, 0)]
+             for ref in cptns_all.squeeze(0).permute(1, 0)]
 
         # calculate scores for each prediction
         scores = defaultdict(list)
