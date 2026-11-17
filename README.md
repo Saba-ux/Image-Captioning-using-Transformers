@@ -90,7 +90,6 @@ The report contains 10 test examples, generated captions, reference captions, an
 - Pandas
 - HDF5
 - NLTK
-- Matplotlib
 
 ## Project Structure
 
