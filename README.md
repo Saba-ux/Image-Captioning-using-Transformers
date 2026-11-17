@@ -83,7 +83,6 @@ The report contains 10 test examples, generated captions, reference captions, an
 
 - Python
 - PyTorch
-- Torchvision
 - ResNet-101
 - Transformer Architecture
 - Attention Mechanism
